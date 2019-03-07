@@ -1,0 +1,48 @@
+{
+  "name": "js-course",
+  "version": "1.0.0",
+  "dependencies": {
+    "config": "^3.0.1",
+    "koa": "^2.7.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-convert": "^1.2.0",
+    "koa-csrf": "^3.0.7",
+    "koa-favicon": "^2.0.1",
+    "koa-generic-session": "^2.0.1",
+    "koa-logger": "^3.2.0",
+    "koa-passport": "^4.1.1",
+    "koa-router": "^7.4.0",
+    "koa-session": "^5.10.1",
+    "koa-session-mongoose": "^2.0.5",
+    "koa-static": "^5.0.0",
+    "mongoose": "^5.4.7",
+    "passport-local": "^1.0.0",
+    "pug": "^2.0.3",
+    "socket.io": "^2.2.0",
+    "socket.io-emitter": "^3.1.1",
+    "socket.io-redis": "^5.2.0"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "local": "nodemon index.js --exec babel-node",
+    "heroku-postbuild": "npm install",
+    "start": "babel-node index.js"
+  },
+  "engines": {
+    "node": "^10.10.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "gulp": "^4.0.0",
+    "gulp-cli": "^2.0.1",
+    "gulp-nodemon": "^2.4.2",
+    "path": "^0.12.7"
+  }
+}

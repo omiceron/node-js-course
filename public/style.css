@@ -1,0 +1,53 @@
+.container {
+  margin: auto;
+  padding: 64px 8px 8px 8px;
+}
+
+.messages {
+  position: absolute;
+  margin: 64px 2px;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+.message {
+  margin: 4px;
+  padding: 8px;
+  height: 64px;
+}
+
+#typing-message {
+  animation-duration: .3s;
+}
+
+
+.fade-out {
+  -webkit-animation-name: fadeOut;
+  animation-name: fadeOut;
+}
+
+.fade-in {
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}

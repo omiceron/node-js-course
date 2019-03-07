@@ -1,0 +1,153 @@
+extends layout
+
+block head
+  //- @see https://github.com/Automattic/socket.io-client
+  script(src="/socket.io/socket.io.js")
+
+  script.
+    const socket = io();
+
+    function showStatus(status, message) {
+      document.querySelector('[data-status]').innerHTML = message || status;
+      document.querySelector('[data-status]').setAttribute('data-status', status);
+    }
+
+    socket.on('server-typing', function(clients) {
+      let typingMessage = document.querySelector('#typing-message');
+
+      if (typingMessage) {
+        typingMessage.classList = 'fade-out'
+        typingMessage.remove();
+      }
+
+      const clientsList = Object.keys(clients).join(' ').trim()
+
+      if (!clientsList) return;
+
+      typingMessage = document.createElement('div');
+      typingMessage.classList = 'fade-in'
+      typingMessage.textContent = `${clientsList} typing...`;
+      typingMessage.id = 'typing-message';
+
+      document.querySelector('.messages').appendChild(typingMessage);
+
+    })
+
+    socket
+      .on('error', function(message) {
+        console.error(message);
+        showStatus('error', message);
+      });
+
+    'connect disconnect reconnect reconnecting reconnect_failed'.split(' ').forEach(function(event) {
+      socket.on(event, function() {
+        showStatus(event);
+      })
+    });
+
+    socket.on('logout', function(data) {
+      socket.disconnect();
+      alert("You logged out");
+      window.location.reload();
+    })
+
+    socket.on('server-message', function(message) {
+      const element = document.createElement('div')
+      element.textContent = `Server message: ${message}`;
+      document.querySelector('.messages').appendChild(element)
+
+    })
+
+    socket.on('message', function({message, user: {displayName}, deliveryTime}, cb) {
+      const messageCard = document.createElement('div')
+      messageCard.classList = 'message';
+      messageCard.style = 'background-color: whitesmoke';
+
+      const image = document.createElement('img');
+      image.classList = 'float-left rounded-circle'
+      image.src = 'https://pp.userapi.com/c830608/v830608266/c3969/XfZFnTWP1zE.jpg'
+      image.style = 'width:50px; height:50px'
+
+
+      const dialog = document.createElement('div')
+      dialog.style = 'margin-left: 66px'
+
+      const nameAndDate = document.createElement('div')
+      nameAndDate.classList = 'd-flex justify-content-between'
+
+      const name = document.createElement('h5');
+      name.classList = 'd-inline'
+      name.textContent = displayName;
+
+      const time = document.createElement('span');
+      time.classList = 'text-muted'
+      time.textContent = (new Date(deliveryTime)).toTimeString().slice(0, 5);
+
+      nameAndDate.appendChild(name)
+      nameAndDate.appendChild(time);
+
+      const text = document.createElement('p');
+      text.style = 'line-height: 16px';
+      text.textContent = message;
+
+      dialog.appendChild(nameAndDate);
+      dialog.appendChild(text);
+      messageCard.appendChild(image);
+      messageCard.appendChild(dialog);
+
+      document.querySelector('.messages').appendChild(messageCard)
+
+      if (cb) cb("from client");
+    });
+
+
+
+block content
+
+  nav.navbar.fixed-top.navbar-light.justify-content-between(style="background-color: #FFF0F0")
+    h1.navbar-brand Chat
+    span(data-status).alert.alert-info.m-0.p-1
+    form.form-inline(method="POST" action="/logout")
+      input(type="hidden" name="_csrf" value=csrf)
+      span.navbar-text.mr-3 Welcome, #{flash}!
+      button.btn.btn-secondary.btn-sm Logout
+
+  .messages
+
+    .message(style="background-color: whitesmoke")
+      img.rounded-circle.float-left(style="width:50px; height:50px" src='https://pp.userapi.com/c830608/v830608266/c3969/XfZFnTWP1zE.jpg')
+      div(style='margin-left: 66px')
+        .d-flex.justify-content-between
+          h5.d-inline Name
+          span 10:00
+        p(style='line-height: 16px') hello world
+
+  form#publish.form.fixed-bottom.p-2(style="background-color: #EFEEEE")
+    input(type="hidden" name="_csrf" value=csrf)
+    .input-group
+      input.form-control(type="text" id="message" name="message" placeholder="Type your message here..." autofocus autocomplete="off")
+      .input-group-append
+        button.btn.btn-primary.btn-lg(type="submit") Send
+
+
+  script.
+    publish.onsubmit = function (e) {
+      e.preventDefault()
+
+      if (!message.value) return;
+
+      socket.emit('message', message.value)
+      message.value = '';
+    }
+
+
+    message.addEventListener('keypress', function (e) {
+      if (message.value) return;
+      socket.emit('typing', true);
+    });
+
+    message.onkeyup = function (e) {
+      if (!message.value) {
+        socket.emit('typing', false);
+      }
+    }
